@@ -9,28 +9,15 @@ from __future__ import unicode_literals
 # your option) any later version.
 
 from json import loads
-from polydag.models import Node
-from django.db import models
+from neo4django.db import models
 
 
-class Course(Node):
-    slug = models.SlugField()
-    description = models.TextField(null=True)
+class Course(models.NodeModel):
+    slug = models.StringProperty()
+    description = models.StringProperty(null=True)
 
     @property
     def last_activity(self):
-        # TODO : define activity
-        # last_act = []
-        # last_docs = self.children().instance_of(Document).order_by('-Document___date')[:1]
-        # if len(last_docs) == 1:
-        #     last_act.append(last_docs[0].date)
-
-        # threads = self.children().instance_of(Thread)
-        # last_msgs = Message.objects.filter(thread__in=threads).order_by('-created')[:1]
-        # if len(last_msgs) == 1:
-        #     last_act.append(last_msgs[0].created)
-        # return max(last_act) if len(last_act)>0 else "NA"
-        # TODO : find last activity
         return "NA"
 
     def last_info(self):
@@ -40,15 +27,12 @@ class Course(Node):
         return data
 
 
-class CourseInfo(models.Model):
-    infos = models.TextField()
-    date = models.DateTimeField(auto_now=True)
-    course = models.ForeignKey(Course)
-
-    class Meta:
-        ordering = ['-date']
+class CourseInfo(models.NodeModel):
+    infos = models.StringProperty()
+    date = models.DateTimeProperty(auto_now=True)
+    course = models.Relationship(Course, rel_type='belongs_to')
 
 
-class Category(Node):
-    slug = models.SlugField()
-    description = models.TextField(null=True)
+class Category(models.NodeModel):
+    slug = models.StringProperty()
+    description = models.StringProperty(null=True)

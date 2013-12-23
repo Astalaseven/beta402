@@ -6,6 +6,7 @@ markdown
 logbook
 celery
 django-celery
+-e git+https://github.com/scholrly/neo4django/#egg=neo4django
 
 # Migrate
 south

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django_defaults import *
 
 # User Profile Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.MyUser'
 
 # Page to show after a syslogin
 LOGIN_REDIRECT_URL = '/zoidberg/home'
@@ -40,6 +40,7 @@ CELERY_ACCEPT_CONTENT = ['json', 'msgpack']
 # libs
 INSTALLED_APPS += (
     'django.contrib.humanize',
+    'neo4django.graph_auth',
     'fragments',
     'south',
     'djcelery',
@@ -48,12 +49,12 @@ INSTALLED_APPS += (
 # apps
 INSTALLED_APPS += (
     'www',
-    'calendars',
+    #'calendars',
     'documents',
     'graph',
-    'telepathy',
+    #'telepathy',
     'users',
-    'polydag',
+    #'polydag',
     'notify',
 )
 
@@ -61,3 +62,15 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'users.processors.user',
     'notify.processors.notify',
 )
+
+AUTHENTICATION_BACKENDS = ('neo4django.graph_auth.backends.NodeModelBackend',)
+
+NEO4J_DATABASES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 7474,
+        'ENDPOINT': '/db/data'
+    }
+}
+
+DATABASE_ROUTERS = ['neo4django.utils.Neo4djangoIntegrationRouter']

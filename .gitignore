@@ -9,3 +9,5 @@ graph.*
 *.log
 www/secret_key.txt
 www/config/local.py
+lib/*
+neo4j

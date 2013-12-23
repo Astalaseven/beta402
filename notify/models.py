@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models
-from polydag.models import Node
-from users.models import User
 from django.db.models.signals import post_save
+from neo4django.db import models
+from www import settings
 
 import signals
 
@@ -14,24 +13,25 @@ import signals
 # 4. User get notif and read it
 
 
-class PreNotification(models.Model):
-    created = models.DateTimeField(auto_now=True)
-    node = models.ForeignKey(Node)  # The node that initiated the notif
-    text = models.CharField(max_length=160)
-    delivered = models.BooleanField(default=False)
-    url = models.URLField()
-    user = models.ForeignKey(User)  # The user that created the notification
-    personal = models.BooleanField(default=False)
+class PreNotification(models.NodeModel):
+    created = models.DateTimeProperty(auto_now=True)
+    text = models.StringProperty(max_length=160)
+    delivered = models.BooleanProperty(default=False)
+    url = models.URLProperty()
+    personal = models.BooleanProperty(default=False)
+
+    user = models.Relationship(settings.AUTH_USER_MODEL, rel_type='created_by')  # The user that created the notification
+    node = models.Relationship(models.NodeModel, rel_type='belongs_to')  # The node that initiated the notif
 
     def __str__(self):
         return self.text
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(User)
-    node = models.ForeignKey(Node)  # The effective node followed by user
-    prenotif = models.ForeignKey(PreNotification)
-    read = models.BooleanField(default=False)
+class Notification(models.NodeModel):
+    user = models.Relationship(settings.AUTH_USER_MODEL, rel_type='served_to')
+    node = models.Relationship(models.NodeModel, rel_type='belongs_to')  # The effective node followed by user
+    prenotif = models.Relationship(PreNotification, rel_type='source')
+    read = models.BooleanProperty(default=False)
 
     @staticmethod
     def direct(user, text, node, url=None):

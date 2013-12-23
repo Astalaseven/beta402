@@ -8,41 +8,38 @@ from __future__ import unicode_literals
 # the Free Software Foundation, either version 3 of the License, or (at
 # your option) any later version.
 
-from django.db import models
-from polydag.models import Taggable
-from polydag.behaviors import OneParent
+from neo4django.db import models as models
 from www import settings
 
 
-class Document(OneParent, Taggable):
+class Document(models.NodeModel):
 
-    description = models.TextField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    description = models.StringProperty()
+    user = models.Relationship(settings.AUTH_USER_MODEL, rel_type='belongs_to')
 
-    size = models.PositiveIntegerField(null=True, default=0)
-    words = models.PositiveIntegerField(null=True, default=0)
-    pages = models.PositiveIntegerField(null=True, default=0)
-    date = models.DateTimeField(auto_now_add=True)
+    size = models.IntegerProperty(null=True, default=0)
+    words = models.IntegerProperty(null=True, default=0)
+    pages = models.IntegerProperty(null=True, default=0)
+    date = models.DateTimeProperty(auto_now_add=True)
 
-    views = models.PositiveIntegerField(null=True, default=0)
-    downloads = models.PositiveIntegerField(null=True, default=0)
+    views = models.IntegerProperty(null=True, default=0)
+    downloads = models.IntegerProperty(null=True, default=0)
 
-    staticfile = models.CharField(max_length=2048, default='')
-    source = models.CharField(max_length=2048, default='')
-    state = models.CharField(max_length=10, default='pending')
+    staticfile = models.StringProperty(default='')
+    source = models.StringProperty(default='')
+    state = models.StringProperty(default='pending')
 
     def move(self, *args, **kwargs):
         # Must move a images and associated files
         # thus NotImplementedError
         raise NotImplementedError
-        super(Document, self).move(*args, **kwargs)
 
 
-class Page(OneParent, Taggable):
-    numero = models.IntegerField()
-    height_120 = models.IntegerField()
-    height_600 = models.IntegerField()
-    height_900 = models.IntegerField()
+class Page(models.NodeModel):
+    numero = models.IntegerProperty()
+    height_120 = models.IntegerProperty()
+    height_600 = models.IntegerProperty()
+    height_900 = models.IntegerProperty()
 
     def move(self, newparent):
         # You may not move a page from a document to another
