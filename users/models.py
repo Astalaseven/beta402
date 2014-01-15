@@ -14,6 +14,30 @@ from neo4django.graph_auth.models import User, UserManager
 from graph.models import Course
 from django.db.models import Q
 import re
+from django.utils import timezone
+
+
+class CustomUserManager(UserManager):
+
+    def _create_user(self, netid, email, password, **extra_fields):
+        """
+        Creates and saves a User with the given username, email and password.
+        """
+        now = timezone.now()
+        if not netid:
+            raise ValueError('The given netid must be set')
+        email = self.normalize_email(email)
+        user = self.model(netid=netid, email=email, last_login=now, **extra_fields)
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, netid, email=None, password=None, **extra_fields):
+        return self._create_user(netid, email, password, **extra_fields)
+
+    def create_superuser(self, netid, email, password, **extra_fields):
+        return self._create_user(netid, email, password, **extra_fields)
 
 
 class MyUser(User):
@@ -21,7 +45,7 @@ class MyUser(User):
     USERNAME_FIELD = 'netid'
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
     DEFAULT_PHOTO = "/static/profile/default.jpg"
-    objects = UserManager()
+    objects = CustomUserManager()
 
     netid = models.StringProperty(indexed=True, unique=True, null=False, blank=False)
     registration = models.StringProperty()
