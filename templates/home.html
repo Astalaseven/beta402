@@ -71,6 +71,11 @@
   <div class="row">
     <div class="large-12 columns">
       <h1>DocHub</h1>
+      {% if page.empty %}
+      <p>Vous n’avez pas de notification non lue. Souhaitez-vous consulter votre liste de cours ou <br>
+      en <a href="{% url 'show_courses' %}">ajouter un nouveau</a> ?</p>
+      <p>Si vous avez besoin d’aide ou une remarque à faire, c’est par <a href="{% url 'help' %}">ici</a>.
+      {% endif %}
     </div>
   </div>
 {% endif %}
@@ -86,10 +91,10 @@
           <div class="user-message-header"><strong><i class="fi-{{ elem.icon }}"></i> {{ elem.text }}</strong></div>
           <div class="user-message-content">
             <div class="feed-element-limited ">
-              {{elem.content|markdown}}
+              {{ elem.content|markdown }}
             </div>
             <div class="feed-date">
-              <a href="{{ elem.url }}">{{ elem.created|naturaltime|capfirst }}</a> par {{elem.user.name}}
+              <a href="{{ elem.url }}">{{ elem.created|naturaltime|capfirst }}</a> par {{ elem.user.name }}
             </div>
           </div>
           <br>
